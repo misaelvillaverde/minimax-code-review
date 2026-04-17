@@ -1,7 +1,7 @@
 const core = require('@actions/core');
 const github = require('@actions/github');
 
-const MINIMAX_API_URL = process.env.MINIMAX_API_URL || 'https://api.minimax.io/v1/chat/completions';
+const MINIMAX_API_URL = process.env.MINIMAX_API_URL || 'https://api.minimax.io/v1/text/chatcompletion_v2';
 const COMMENT_MARKER = '<!-- minimax-code-review -->';
 const MAX_RESPONSE_SIZE = 1024 * 1024;
 const REQUEST_TIMEOUT_MS = 300_000;
@@ -83,6 +83,7 @@ async function reviewWithMiniMax(apiKey, model, systemPrompt, diff) {
       },
       body: JSON.stringify({
         model,
+        max_tokens: 8192,
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: `Please review this pull request:\n\n${diff}` },
@@ -116,7 +117,9 @@ async function reviewWithMiniMax(apiKey, model, systemPrompt, diff) {
     throw new Error('MiniMax API returned invalid JSON.');
   }
 
-  const content = data.choices?.[0]?.message?.content;
+  const message = data.choices?.[0]?.message ?? {};
+  let content = message.content ?? message.reasoning_content ?? '';
+  content = content.replace(/<think>[\s\S]*?<\/think>/g, '').trim();
   if (!content) {
     throw new Error('MiniMax API returned an empty response.');
   }
