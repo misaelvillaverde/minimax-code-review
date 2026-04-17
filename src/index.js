@@ -118,9 +118,12 @@ async function reviewWithMiniMax(apiKey, model, systemPrompt, diff) {
   }
 
   const message = data.choices?.[0]?.message ?? {};
-  let content = message.content ?? message.reasoning_content ?? '';
-  content = content.replace(/<think>[\s\S]*?<\/think>/g, '').trim();
+  const rawContent = message.content ?? '';
+  const reasoning = message.reasoning_content ?? '';
+  const stripped = rawContent.replace(/<think>[\s\S]*?<\/think>/g, '').trim();
+  const content = stripped || rawContent.trim() || reasoning.trim();
   if (!content) {
+    core.warning(`MiniMax raw response: ${text.slice(0, 2000)}`);
     throw new Error('MiniMax API returned an empty response.');
   }
   return content;
