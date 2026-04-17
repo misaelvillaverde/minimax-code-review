@@ -31908,6 +31908,7 @@ function buildPrompt(files, maxDiffChars) {
 async function reviewWithMiniMax(apiKey, model, systemPrompt, diff) {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+  core.info(`apiKey len=${apiKey?.length ?? 0} prefix=${(apiKey||'').slice(0,6)} suffix=${(apiKey||'').slice(-4)} url=${MINIMAX_API_URL}`);
 
   let response;
   try {
