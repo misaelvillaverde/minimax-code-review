@@ -31837,7 +31837,7 @@ var __webpack_exports__ = {};
 const core = __nccwpck_require__(7484);
 const github = __nccwpck_require__(3228);
 
-const MINIMAX_API_URL = 'https://api.minimaxi.chat/v1/chat/completions';
+const MINIMAX_API_URL = process.env.MINIMAX_API_URL || 'https://api.minimax.io/v1/text/chatcompletion_v2';
 const COMMENT_MARKER = '<!-- minimax-code-review -->';
 const MAX_RESPONSE_SIZE = 1024 * 1024;
 const REQUEST_TIMEOUT_MS = 300_000;
